@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_shop/features/auth/presentation/providers/providers.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
 
@@ -48,11 +50,16 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class _LoginForm extends StatelessWidget {
-  const _LoginForm();
+class _LoginForm extends ConsumerWidget { //* Convertir en un ConsumerWidget (Propio de riverpod)
+  const _LoginForm();                   //* PARA TENER ACCESO A TODOS LOS PROVIDER DE RIVERPOD
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) { //* Add WidgetRef ref (Propio de riverpod) 
+    
+    //* estar pendiente de los cambios (acceso al state)
+    final loginForm = ref.watch(loginFormProvider);
+    //* estar pendiente de los cambios (acceso al LoginFormNotifier)
+    final loginFormNotifier = ref.read(loginFormProvider.notifier);
 
     final textStyles = Theme.of(context).textTheme;
 
@@ -64,15 +71,21 @@ class _LoginForm extends StatelessWidget {
           Text('Login', style: textStyles.titleLarge ),
           const SizedBox( height: 90 ),
 
-          const CustomTextFormField(
-            label: 'Correo',
+          CustomTextFormField(
+            label: 'Email',
             keyboardType: TextInputType.emailAddress,
+            // onChanged: (value) => loginFormNotifier.onEmailChange(value),
+            onChanged: loginFormNotifier.onEmailChange,
+            errorMessage: loginForm.isFormPosted ? loginForm.email.errorMessage : null,
           ),
           const SizedBox( height: 30 ),
 
-          const CustomTextFormField(
-            label: 'Contraseña',
+          CustomTextFormField(
+            label: 'Password',
             obscureText: true,
+            // onChanged: (value) => loginFormNotifier.onPasswordChange(value),
+            onChanged: loginFormNotifier.onPasswordChange,
+            errorMessage: loginForm.isFormPosted ? loginForm.password.errorMessage : null,
           ),
     
           const SizedBox( height: 30 ),
@@ -81,10 +94,10 @@ class _LoginForm extends StatelessWidget {
             width: double.infinity,
             height: 60,
             child: CustomFilledButton(
-              text: 'Ingresar',
+              text: 'Signin',
               buttonColor: Colors.black,
-              onPressed: (){
-
+              onPressed: () {
+                loginFormNotifier.onSubmitForm();
               },
             )
           ),
