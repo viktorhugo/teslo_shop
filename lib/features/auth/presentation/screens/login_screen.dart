@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_shop/features/auth/presentation/providers/auth_provider.dart';
 import 'package:teslo_shop/features/auth/presentation/providers/providers.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
@@ -54,13 +55,19 @@ class _LoginForm extends ConsumerWidget { //* Convertir en un ConsumerWidget (Pr
   const _LoginForm();                   //* PARA TENER ACCESO A TODOS LOS PROVIDER DE RIVERPOD
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) { //* Add WidgetRef ref (Propio de riverpod) 
+  Widget build(BuildContext context, WidgetRef ref) { //* Add WidgetRef ref (Propio de riverpod) cuan se destruye este widget tambien los listener
     
     //* estar pendiente de los cambios (acceso al state)
     final loginForm = ref.watch(loginFormProvider);
-    //* estar pendiente de los cambios (acceso al LoginFormNotifier)
+    
+    //* estar escuchando de los cambios (acceso al LoginFormNotifier)
     final loginFormNotifier = ref.read(loginFormProvider.notifier);
 
+    //* estar escuchando los estados del authProvider
+    ref.listen(authProvider, (previous, next) { 
+      if (next.errorMessage!.isEmpty) return;
+      showSnackbarAlert(context, next.errorMessage!);
+    });
     final textStyles = Theme.of(context).textTheme;
 
     return Padding(
@@ -118,6 +125,13 @@ class _LoginForm extends ConsumerWidget { //* Convertir en un ConsumerWidget (Pr
           const Spacer( flex: 1),
         ],
       ),
+    );
+  }
+
+  showSnackbarAlert(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message))
     );
   }
 }

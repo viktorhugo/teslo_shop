@@ -4,8 +4,8 @@ import 'package:teslo_shop/features/auth/domain/domain.dart';
 
 abstract class AuthRepository {
 
-  Future<User> login(String email, String password);
-  Future<User> register(String userName, String email, String password);
-  Future<User> checkAuthStatus(String token);
+  Future<User> login({ required String email, required String password});
+  Future<User> register({ required String userName, required String email, required String password });
+  Future<User> checkAuthStatus({ required String token });
 
 }

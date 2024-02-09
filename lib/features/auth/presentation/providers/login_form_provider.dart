@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
 import 'package:logger/logger.dart';
+import 'package:teslo_shop/features/auth/presentation/providers/auth_provider.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
 var logger = Logger();
@@ -51,7 +52,12 @@ class LoginFormState {
 
 //! 2 -como implementamos un notifier
 class LoginFormNotifier extends StateNotifier<LoginFormState> {
-  LoginFormNotifier(): super(
+
+  final  Function({ required String email,  required String password}) loginUserCallback;
+
+  LoginFormNotifier({
+    required this.loginUserCallback
+  }): super(
     LoginFormState() ///* CREACION DEL ESTADO INICIAL
   );
 
@@ -71,10 +77,11 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
     );
   }
 
-  onSubmitForm() {
+  onSubmitForm() async {
     _touchEveryFiled();
     //* SI NO SON VALIDOS LOS FIELDS NO HAGA NADA
     if ( !state.isValid ) return;
+    await loginUserCallback(email: state.email.value, password: state.password.value);
 
     // logger.d("State: $state");
     print(state);
@@ -95,7 +102,8 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
   
 }
 
-//! 3 -StateNotifierProvider -consume afuera
+//! 3 -StateNotifierProvider - consume afuera
 final loginFormProvider = StateNotifierProvider.autoDispose<LoginFormNotifier, LoginFormState>((ref) { //* se coloca el autoDispose para que cuando se
-  return LoginFormNotifier();                                                                       //* que cuando se salga de la pantalla y vuelca no esten los datos del login
+  final loginUserCallback = ref.watch(authProvider.notifier).loginUser;
+  return LoginFormNotifier(loginUserCallback: loginUserCallback);                                                                       //* que cuando se salga de la pantalla y vuelca no esten los datos del login
 });
