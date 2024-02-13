@@ -81,10 +81,14 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
     _touchEveryFiled();
     //* SI NO SON VALIDOS LOS FIELDS NO HAGA NADA
     if ( !state.isValid ) return;
-    await loginUserCallback(email: state.email.value, password: state.password.value);
 
+    state = state.copyWith( isPosting: true );
+
+    await loginUserCallback(email: state.email.value, password: state.password.value);
+    
+    state = state.copyWith( isPosting: false );
     // logger.d("State: $state");
-    print(state);
+    // print(state);
 
   }
 

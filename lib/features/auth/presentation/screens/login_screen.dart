@@ -65,6 +65,7 @@ class _LoginForm extends ConsumerWidget { //* Convertir en un ConsumerWidget (Pr
 
     //* estar escuchando los estados del authProvider
     ref.listen(authProvider, (previous, next) { 
+      // print(' ========= next ${next.errorMessage}');
       if (next.errorMessage!.isEmpty) return;
       showSnackbarAlert(context, next.errorMessage!);
     });
@@ -101,11 +102,11 @@ class _LoginForm extends ConsumerWidget { //* Convertir en un ConsumerWidget (Pr
             width: double.infinity,
             height: 60,
             child: CustomFilledButton(
-              text: 'Signin',
+              text: 'Sign in',
               buttonColor: Colors.black,
-              onPressed: () {
-                loginFormNotifier.onSubmitForm();
-              },
+              onPressed: loginForm.isPosting 
+              ? null
+              : () => loginFormNotifier.onSubmitForm(),
             )
           ),
 

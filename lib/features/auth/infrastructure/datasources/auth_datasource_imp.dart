@@ -14,14 +14,35 @@ class AuthDataSourceImp extends AuthDataSource {
 
   final dio = Dio(
     BaseOptions(
-      baseUrl: Enviroment.apiurl
+      baseUrl: Environment.apiurl
     )
   );
 
   @override
-  Future<User> checkAuthStatus(String token) {
-    // TODO: implement checkAuthStatus
-    throw UnimplementedError();
+  Future<User> checkAuthStatus(String token) async {
+    try {
+      final Options options = Options(
+        headers: {
+          'Authorization' : 'Bearer $token'
+        }
+      );
+      final response = await dio.get('/auth/check-status', options: options );
+      // logger.i(response);
+      final user = UserMapper.userJsonToEntity(response.data);
+      return user;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw CustomError(message: 'Wrong Credentials');
+      }
+      if (e.type == DioExceptionType.connectionTimeout) {
+        throw CustomError(message: 'Connection Timeout');
+      }
+      logger.e(e.response!.data['message']);
+      throw Exception();
+    } catch (e) {
+      logger.e(e);
+      throw Exception();
+    }
   }
 
   @override
