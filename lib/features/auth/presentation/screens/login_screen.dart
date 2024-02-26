@@ -90,10 +90,12 @@ class _LoginForm extends ConsumerWidget { //* Convertir en un ConsumerWidget (Pr
 
           CustomTextFormField(
             label: 'Password',
+            onSubmitForm: (value) => loginFormNotifier.onSubmitForm(),
             obscureText: true,
             // onChanged: (value) => loginFormNotifier.onPasswordChange(value),
             onChanged: loginFormNotifier.onPasswordChange,
             errorMessage: loginForm.isFormPosted ? loginForm.password.errorMessage : null,
+
           ),
     
           const SizedBox( height: 30 ),
