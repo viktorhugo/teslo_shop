@@ -89,7 +89,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       //* update state
       _setLoggedUser(user);
     } catch (e) {
-      logger.e(e);
       logout();
     }
   }
