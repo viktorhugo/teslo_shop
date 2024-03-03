@@ -61,6 +61,32 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
     loadNextPage();
   }
 
+  Future<bool> createOrUpdateProduct(Map<String, dynamic> productLike) async {
+    try {
+      final product = await productsRepository.createUpdateProduct(productLike);
+      // check product exists in list
+      final isProductAlreadyExists = state.products.any((element) => element.id == product.id);
+      // si no existe el producto se guarda
+      if (!isProductAlreadyExists) {
+        state = state.copyWith(
+          products: [...state.products, product]
+        );
+        return true;
+      } else {
+        // update product
+        state = state.copyWith(
+          products: state.products.map(
+            (element) => (element.id == product.id) ? product : element
+          ).toList()
+        ); 
+        return true;
+      }
+      
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future loadNextPage() async {
 
     if (state.isLoading || state.isLastPage) return;
@@ -82,10 +108,9 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
       isLoading: false,
       offset: state.offset + 10,
       products: [...state.products, ...products]
-    );
-    
+    ); 
   }
-
+  
 }
 
 //* Provee el state de manera global

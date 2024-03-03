@@ -45,16 +45,35 @@ class ProductNotifier extends StateNotifier<ProductState> {
     getProduct();
   }
 
+  Product newEmptyProduct() {
+    return Product(
+      id: 'new', 
+      title: '', 
+      price: 0, 
+      description: '', 
+      slug: '', 
+      stock: 0, 
+      sizes: [], 
+      gender: 'men', 
+      tags: [], 
+      images: [], 
+    );
+  }
+
   Future<void> getProduct() async {
-    try {
-      final product = await productsRepository.getProductById(id: state.id);
+    print(state.id == 'new');
+    if (state.id == 'new') {
       state = state.copyWith(
         isLoading: false,
-        product: product
+        product: newEmptyProduct()
       );
-    } catch (e) {
-      print(e);
+      return;
     }
+    final product = await productsRepository.getProductById(id: state.id);
+    state = state.copyWith(
+      isLoading: false,
+      product: product
+    );
   }
   
 }
